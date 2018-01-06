@@ -40,7 +40,7 @@ module.exports = function() {
 			if ( !response || !body ) throw "publicRequest error: "+error;
 			if ( callback ) {
 				try {
-					callback(JSON.parse(body));
+					callback(JSON.parse(body), data);
 				} catch (error) {
 					console.log("Parse error: "+error.message);
 				}
