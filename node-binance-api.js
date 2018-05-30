@@ -569,6 +569,10 @@ LIMIT_MAKER
 			let params = asset ? {asset:asset} : {};
 			signedRequest(wapi+'v3/withdrawHistory.html', params, callback);
 		},
+		withdrawFee: function(callback, asset = false) {
+			let params = asset ? {asset:asset} : {};
+			signedRequest(wapi+'v3/withdrawFee.html', params, callback);
+		},
 		depositHistory: function(callback, asset = false) {
 			let params = asset ? {asset:asset} : {};
 			signedRequest(wapi+'v3/depositHistory.html', params, callback);
