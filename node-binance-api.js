@@ -95,7 +95,11 @@ module.exports = function() {
 			}
 		};
 		request(opt, function(error, response, body) {
-			if ( !response || !body ) throw 'signedRequest error: '+error;
+			if ( !response || !body ) {
+				if ( callback ) {
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+				}
+			};
 			if ( callback ) {
 				try {
 					callback(JSON.parse(body));
@@ -146,21 +150,46 @@ LIMIT_MAKER
 	};
 	////////////////////////////
 	const subscribe = function(endpoint, callback, reconnect = false) {
-		const ws = new WebSocket(websocket_base+endpoint);
-		ws.endpoint = endpoint;
-		ws.on('open', function() {
-			//console.log('subscribe('+this.endpoint+')');
-		});
-		ws.on('close', function() {
-			if ( reconnect && options.reconnect ) {
-				if ( this.endpoint && parseInt(this.endpoint.length, 10) === 60 ) console.log('Account data WebSocket reconnecting..');
-				else console.log('WebSocket reconnecting: '+this.endpoint);
+		console.log('Binance subscribe fn 149')
+		var ws;
+		try {
+			console.log('Binance new WebSocket 152')
+			ws = new WebSocket(websocket_base+endpoint);
+		} catch (e) {
+			console.log('Binance new WebSocket ERROR L152 ', e);
+
+			setTimeout(function () {
+				console.log('Binance reconnect timeout L158');
 				try {
+					console.log('Binance reconnecting L160');
 					reconnect();
 				} catch ( error ) {
-					console.error('WebSocket reconnect error: '+error.message);
+					console.error('Binance websocket reconnect error L163: '+error.message);
 				}
-			} else console.log('WebSocket connection closed! '+this.endpoint);
+			}, 30000);
+
+			return;
+		}
+		ws.endpoint = endpoint;
+		ws.on('open', function() {
+			console.log('Binance websocket subscribed ('+this.endpoint+')');
+		});
+		ws.on('close', function() {
+			console.log('Binance websocket closed L170')
+			if ( reconnect && options.reconnect ) {
+				if ( this.endpoint && parseInt(this.endpoint.length, 10) === 60 ) console.log('Account data WebSocket reconnecting..');
+				else console.log('Binance websocket reconnecting: '+this.endpoint);
+
+				setTimeout(function () {
+					try {
+						console.log('Binance reconnecting L177');
+						reconnect();
+					} catch ( error ) {
+						console.error('Binance websocket reconnect error L180: '+error.message);
+					}
+				}, 30000);
+
+			} else console.log('Binance websocket connection closed! '+this.endpoint);
 		});
 		ws.on('message', function(data) {
 			//console.log(data);
@@ -170,6 +199,9 @@ LIMIT_MAKER
 				console.error('Parse error: '+error.message);
 			}
 		});
+		ws.on('error', function (err) {
+			console.log('Binance on error L199 ', err);
+		})
 		subscriptions[endpoint] = ws;
 		return ws;
 	};
@@ -656,9 +688,12 @@ Move this to a future release v0.4.0
 				ws.terminate();
 				delete subscriptions[endpoint];
 			},
-			depth: function depth(symbols, callback) {
+			depth: function depthFunction(symbols, callback) {
 				for ( let symbol of symbols ) {
-					subscribe(symbol.toLowerCase()+'@depth', callback);
+					let reconnect = function() {
+						if ( options.reconnect ) depthFunction([symbol], callback);
+					};
+					subscribe(symbol.toLowerCase()+'@depth', callback, reconnect);
 				}
 			},
 			depthCache: function depthCacheFunction(symbols, callback, limit = 500) {
