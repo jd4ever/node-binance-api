@@ -4,7 +4,7 @@
   "description": "Binance API for node https://github.com/jaggedsoft/node-binance-api",
   "main": "node-binance-api.js",
   "dependencies": {
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "ws": "^3.2.0"
   },
   "scripts": {

@@ -39,7 +39,13 @@ module.exports = function() {
 			}
 		};
 		request(opt, function(error, response, body) {
-			if ( !response || !body ) throw 'publicRequest error: '+error;
+			if ( !response || !body ) {
+				console.error('publicRequest error binanceAPI L43: '+error + ' ' + url)
+				if ( callback ) {
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+				}
+				return;
+			};
 			if ( callback ) {
 				try {
 					callback(JSON.parse(body), data);
@@ -64,7 +70,13 @@ module.exports = function() {
 			}
 		};
 		request(opt, function(error, response, body) {
-			if ( !response || !body ) throw 'apiRequest error: '+error;
+			if ( !response || !body ) {
+				console.error('apiRequest error binanceAPI L73: '+error + ' ' + url)
+				if ( callback ) {
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+				}
+				return;
+			};
 			if ( callback ) {
 				try {
 					callback(JSON.parse(body));
@@ -96,9 +108,11 @@ module.exports = function() {
 		};
 		request(opt, function(error, response, body) {
 			if ( !response || !body ) {
+				console.error('signedRequest error binanceAPI L104: '+error + ' ' + url)
 				if ( callback ) {
 					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
 				}
+				return;
 			};
 			if ( callback ) {
 				try {
@@ -150,10 +164,10 @@ LIMIT_MAKER
 	};
 	////////////////////////////
 	const subscribe = function(endpoint, callback, reconnect = false) {
-		console.log('Binance subscribe fn 149')
+		// console.log('Binance subscribe fn 149')
 		var ws;
 		try {
-			console.log('Binance new WebSocket 152')
+			// console.log('Binance new WebSocket 152')
 			ws = new WebSocket(websocket_base+endpoint);
 		} catch (e) {
 			console.log('Binance new WebSocket ERROR L152 ', e);
@@ -569,10 +583,21 @@ LIMIT_MAKER
 			let params = asset ? {asset:asset} : {};
 			signedRequest(wapi+'v3/withdrawHistory.html', params, callback);
 		},
-		withdrawFee: function(callback, asset = false) {
-			let params = asset ? {asset:asset} : {};
-			signedRequest(wapi+'v3/withdrawFee.html', params, callback);
-		},
+		// withdrawFee: function(callback, asset = false) {
+		// 	let params = asset ? {asset:asset} : {};
+		// 	signedRequest(wapi+'v3/withdrawFee.html', params, callback);
+		// },
+
+		/**
+        * Fetch asset detail (minWithdrawAmount, depositStatus, withdrawFee, withdrawStatus, depositTip)
+        * @param {function} callback - the callback function
+        * @return {undefined}
+        */
+        assetDetail: function (callback) {
+            signedRequest(wapi + 'v3/assetDetail.html', {}, callback);
+        },
+
+
 		depositHistory: function(callback, asset = false) {
 			let params = asset ? {asset:asset} : {};
 			signedRequest(wapi+'v3/depositHistory.html', params, callback);
