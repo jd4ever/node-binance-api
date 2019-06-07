@@ -40,9 +40,9 @@ module.exports = function() {
 		};
 		request(opt, function(error, response, body) {
 			if ( !response || !body ) {
-				console.error('publicRequest error binanceAPI L43: '+error + ' ' + url)
+				console.error('Binance publicRequest error binanceAPI L43: '+error + ' ' + url)
 				if ( callback ) {
-					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' }, data)
 				}
 				return;
 			};
@@ -50,7 +50,7 @@ module.exports = function() {
 				try {
 					callback(JSON.parse(body), data);
 				} catch (error) {
-					console.error('Parse error: '+error.message);
+					console.error('Binance publicRequest Parse error L53: '+error.message);
 				}
 			}
 		});
@@ -71,9 +71,9 @@ module.exports = function() {
 		};
 		request(opt, function(error, response, body) {
 			if ( !response || !body ) {
-				console.error('apiRequest error binanceAPI L73: '+error + ' ' + url)
+				console.error('Binance apiRequest error binanceAPI L73: '+error + ' ' + url)
 				if ( callback ) {
-					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' }, data)
 				}
 				return;
 			};
@@ -81,7 +81,7 @@ module.exports = function() {
 				try {
 					callback(JSON.parse(body));
 				} catch (error) {
-					console.error('Parse error: '+error.message);
+					console.error('Binance apiRequest Parse error L84: '+error.message);
 				}
 			}
 		});
@@ -108,9 +108,9 @@ module.exports = function() {
 		};
 		request(opt, function(error, response, body) {
 			if ( !response || !body ) {
-				console.error('signedRequest error binanceAPI L104: '+error + ' ' + url)
+				console.error('Binance signedRequest error binanceAPI L104: '+error + ' ' + url)
 				if ( callback ) {
-					callback({ code: -1001, msg: 'Binance API error: !response || !body' })
+					callback({ code: -1001, msg: 'Binance API error: !response || !body' }, data)
 				}
 				return;
 			};
@@ -118,7 +118,7 @@ module.exports = function() {
 				try {
 					callback(JSON.parse(body));
 				} catch (error) {
-					console.error('Parse error: '+error.message);
+					console.error('Binance signedRequest Parse error L121: '+error.message);
 				}
 			}
 		});
